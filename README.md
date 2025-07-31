@@ -99,6 +99,11 @@ gnoland config set p2p.laddr "tcp://0.0.0.0:26656"
 gnoland config set rpc.laddr "tcp://127.0.0.1:26657"
 ```
 
+### you can start it inside a screen session.
+```
+gnoland start --skip-genesis-sig-verification --genesis genesis.json
+```
+
 ### if you want to create new wallet.
 ```
 gnokey add wallet
