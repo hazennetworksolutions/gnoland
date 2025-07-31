@@ -99,10 +99,16 @@ gnoland config set p2p.laddr "tcp://0.0.0.0:26656"
 gnoland config set rpc.laddr "tcp://127.0.0.1:26657"
 ```
 
+### if you want to create new wallet.
+```
+gnokey add wallet
+```
+
 
 ### if you want to import the previous wallet first.
+```
 gnokey add hazenwallet --recover
-
+```
 
 ```
 gnoland secrets get node_id
@@ -120,8 +126,8 @@ gnoland secrets get validator_key
 ```
 
 {
-    "address": "ADRESS",
-    "pub_key": "PUBKEY"
+    "address": "VALADRESS",
+    "pub_key": "VALPUBKEY"
 }
 
 
@@ -135,8 +141,8 @@ gnokey maketx call \
   -chainid "test7.2" \
   -args "MONIKER" \
   -args "INFORMATION" \
-  -args "ADRESS" \
-  -args "PUBKEY" \
+  -args "VALADRESS" \
+  -args "VALPUBKEY" \
   -remote "https://rpc.test7.testnets.gno.land:443" \
   WALLETNAME
 ```
