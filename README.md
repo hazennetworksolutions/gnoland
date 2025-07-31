@@ -1,9 +1,11 @@
 <h1 align="center"> Gnoland Node Ubuntu Installation Version 7.2 </h1>
 
 <img width="1920" height="1080" alt="gnoland" src="https://github.com/user-attachments/assets/fcb92812-05a8-46f5-933a-66393fff96c2" />
+
 * [Gnoland Website](https://gno.land/)<br>
 * [Gnoland Discord](https://discord.com/invite/S8nKUqwkPn)<br>
 * [Gnoland Explorer](https://gnoscan.io/?type=custom&rpcUrl=https://rpc.test7.testnets.gno.land/&indexerUrl=)<br>
+
 
 
 ```
