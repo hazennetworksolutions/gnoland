@@ -182,7 +182,7 @@ gnokey maketx call \
   -args "INFORMATION" \
   -args "VALADRESS" \
   -args "VALPUBKEY" \
-  -remote "https://rpc.test7.testnets.gno.land:443" \
+  -remote "https://rpc.test9.testnets.gno.land:443" \
   WALLETNAME
 ```
 
