@@ -99,7 +99,7 @@ gnoland config set p2p.persistent_peers "g1d60r9u40340kqrt62cffh6yuc0gfmevz60n8s
 gnoland config set p2p.seeds "g1d60r9u40340kqrt62cffh6yuc0gfmevz60n8s9@gno-core-sen-01.test9.testnets.gno.land:26656"
 
 gnoland config set p2p.pex true
-gnoland config set moniker "HazenNetworkSolutions"
+gnoland config set moniker "MONIKER"
 gnoland config set mempool.size 10000
 gnoland config set p2p.max_num_outbound_peers 40
 gnoland config set telemetry.enabled false
