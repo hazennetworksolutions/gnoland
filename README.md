@@ -1,4 +1,4 @@
-<h1 align="center"> Gnoland Node Ubuntu Installation Version 7.2 </h1>
+<h1 align="center"> Gnoland Node Ubuntu Installation Version 9.0 </h1>
 
 <img width="1920" height="1080" alt="gnoland" src="https://github.com/user-attachments/assets/fcb92812-05a8-46f5-933a-66393fff96c2" />
 
@@ -31,7 +31,7 @@ export PATH="$HOME/go/bin:$PATH"
 ```
 git clone https://github.com/gnolang/gno.git
 cd gno
-git checkout tags/chain/test7.2
+git checkout tags/chain/test9.0
 ```
 
 ```
@@ -74,7 +74,7 @@ rm -f genesis.json
 ```
 
 ```
-wget -O genesis.json https://gno-testnets-genesis.s3.eu-central-1.amazonaws.com/test7/genesis.json
+wget -O genesis.json https://gno-testnets-genesis.s3.eu-central-1.amazonaws.com/test9/genesis.json
 shasum -a 256 genesis.json
 ```
 
@@ -94,12 +94,12 @@ gnoland config set consensus.timeout_commit 3s
 gnoland config set consensus.peer_gossip_sleep_duration 10ms
 gnoland config set p2p.flush_throttle_timeout 10ms
 
-gnoland config set p2p.persistent_peers "g137jz3hjhz6psrxxjtj5h7h4s6llfyrv2zxtfq3@gno-core-sen-01.test7.testnets.gno.land:26656,g1kpxll39mgzfhsepazzs0vne2l42mmkylxkt6un@gno-core-sen-02.test7.testnets.gno.land:26656"
+gnoland config set p2p.persistent_peers "g1d60r9u40340kqrt62cffh6yuc0gfmevz60n8s9@gno-core-sen-01.test9.testnets.gno.land:26656"
 
-gnoland config set p2p.seeds "g137jz3hjhz6psrxxjtj5h7h4s6llfyrv2zxtfq3@gno-core-sen-01.test7.testnets.gno.land:26656,g1kpxll39mgzfhsepazzs0vne2l42mmkylxkt6un@gno-core-sen-02.test7.testnets.gno.land:26656"
+gnoland config set p2p.seeds "g1d60r9u40340kqrt62cffh6yuc0gfmevz60n8s9@gno-core-sen-01.test9.testnets.gno.land:26656"
 
 gnoland config set p2p.pex true
-gnoland config set moniker "MONIKER"
+gnoland config set moniker "HazenNetworkSolutions"
 gnoland config set mempool.size 10000
 gnoland config set p2p.max_num_outbound_peers 40
 gnoland config set telemetry.enabled false
@@ -107,9 +107,35 @@ gnoland config set p2p.laddr "tcp://0.0.0.0:26656"
 gnoland config set rpc.laddr "tcp://127.0.0.1:26657"
 ```
 
-### you can start it inside a screen session.
+### systemd service commands.
 ```
-gnoland start --skip-genesis-sig-verification --genesis genesis.json
+sudo tee /etc/systemd/system/gnoland.service > /dev/null <<EOF
+[Unit]
+Description=Gnoland node
+After=network-online.target
+
+[Service]
+User=root
+WorkingDirectory=/root/gno
+ExecStart=$(which gnoland) start \
+  --genesis /root/gno/genesis.json \
+  --data-dir /root/gno/gnoland-data \
+  --skip-genesis-sig-verification
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+```
+
+### start gnoland with systemd.
+```
+sudo systemctl enable gnoland
+sudo systemctl restart gnoland
+sudo journalctl -u gnoland -f --no-hostname -o cat
 ```
 
 ### if you want to create new wallet.
