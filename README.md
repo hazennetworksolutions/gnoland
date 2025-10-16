@@ -172,7 +172,7 @@ gnoland secrets get validator_key
 
 ```
 gnokey maketx call \
-  -pkgpath "gno.land/r/gnoland/valopers" \
+  -pkgpath "gno.land/r/gnops/valopers" \
   -func "Register" \
   -gas-fee 1000000ugnot \
   -gas-wanted 30000000 \
