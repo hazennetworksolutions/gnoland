@@ -7,7 +7,7 @@
 * [Gnoland Explorer](https://gnoscan.io/?type=custom&rpcUrl=https://rpc.test7.testnets.gno.land/&indexerUrl=)<br>
 
 
-
+### do not forget to stop the node and reset chain data
 ```
 sudo apt update
 sudo apt install lz4 -y
