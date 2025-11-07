@@ -177,7 +177,7 @@ gnokey maketx call \
   -gas-fee 1000000ugnot \
   -gas-wanted 30000000 \
   -broadcast \
-  -chainid "test9" \
+  -chainid "test9.1" \
   -args "MONIKER" \
   -args "INFORMATION" \
   -args "VALADRESS" \
