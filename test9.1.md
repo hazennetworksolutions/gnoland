@@ -113,7 +113,6 @@ sudo tee /etc/systemd/system/gnoland.service > /dev/null <<EOF
 [Unit]
 Description=Gnoland node
 After=network-online.target
-
 [Service]
 User=root
 WorkingDirectory=/root/gno
@@ -121,10 +120,9 @@ ExecStart=$(which gnoland) start \
   --genesis /root/gno/genesis.json \
   --data-dir /root/gno/gnoland-data \
   --skip-genesis-sig-verification
-Restart=on-failure
+Restart=always
 RestartSec=5
 LimitNOFILE=65535
-
 [Install]
 WantedBy=multi-user.target
 EOF
