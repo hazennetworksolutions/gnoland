@@ -110,6 +110,7 @@ rm "go$VER.linux-amd64.tar.gz"
 
 [ ! -f ~/.bash_profile ] && touch ~/.bash_profile
 echo 'export PATH=/usr/local/go/bin:$HOME/go/bin:$PATH' >> ~/.bash_profile
+echo 'export GNOROOT=$HOME/gno' >> ~/.bash_profile
 source $HOME/.bash_profile
 [ ! -d ~/go/bin ] && mkdir -p ~/go/bin
 export PATH="$HOME/go/bin:$PATH"
@@ -160,7 +161,7 @@ Verify the installation:
 
 ```bash
 gno version
-gnoland --version
+gnoland version
 ```
 
 ---
@@ -232,7 +233,7 @@ gnoland config set p2p.flush_throttle_timeout 10ms
 gnoland config set p2p.pex true
 gnoland config set p2p.max_num_outbound_peers 40
 gnoland config set mempool.size 10000
-gnoland config set telemetry.enabled false
+gnoland config set telemetry.metrics_enabled false
 gnoland config set p2p.laddr "tcp://0.0.0.0:26656"
 gnoland config set rpc.laddr "tcp://127.0.0.1:26657"
 gnoland config set p2p.external_address "YOUR-SERVER-IP:26656"
@@ -393,10 +394,12 @@ gnokey query \
 
 > ⚠️ Gnoland uses a **GovDAO-based validator registration** system. Registration is done by calling a realm (smart contract). Becoming active in the validator set requires a GovDAO governance proposal to pass — registration alone is not enough.
 
-### Get your Validator Key
+### Get your Validator Public Key
+
+Run from the `/root/gno` directory:
 
 ```bash
-gnoland secrets get validator_key
+cd /root/gno && gnoland secrets get validator_key
 ```
 
 Expected output:
@@ -407,7 +410,7 @@ Expected output:
 }
 ```
 
-> The `address` and `pub_key` from this output are what you need for registration.
+> ⚠️ In test13, only the `pub_key` is used for registration. The `address` here is the consensus key address — **do not use it** as the operator address. Use your wallet address from `gnokey list` instead.
 
 ### Submit Validator Registration
 
@@ -420,7 +423,7 @@ gnokey maketx call \
   --args "MONIKER" \
   --args "DESCRIPTION" \
   --args "data-center" \
-  --args "VAL_ADDRESS" \
+  --args "OPERATOR_ADDRESS" \
   --args "VAL_PUBKEY" \
   --gas-fee 1000000ugnot \
   --gas-wanted 50000000 \
@@ -435,8 +438,8 @@ gnokey maketx call \
 | `MONIKER` | Your validator display name |
 | `DESCRIPTION` | Short description of your validator |
 | `data-center` | Your infrastructure location |
-| `VAL_ADDRESS` | `address` from `gnoland secrets get validator_key` |
-| `VAL_PUBKEY` | `pub_key` from `gnoland secrets get validator_key` |
+| `OPERATOR_ADDRESS` | Your **wallet** `g1...` address from `gnokey list` |
+| `VAL_PUBKEY` | `pub_key` from `cd /root/gno && gnoland secrets get validator_key` |
 | `WALLETNAME` | Key name from `gnokey list` |
 
 > ℹ️ After a successful transaction you can view your profile at:  
@@ -491,10 +494,12 @@ curl -s http://localhost:26657/net_info | jq .result.n_peers
 
 ### Node Info
 
+> ℹ️ Run secrets commands from `/root/gno` directory:
+
 ```bash
-gnoland secrets get node_id
-gnoland secrets get validator_key
-gnoland secrets get
+cd /root/gno && gnoland secrets get node_id
+cd /root/gno && gnoland secrets get validator_key
+cd /root/gno && gnoland secrets get
 ```
 
 ### Wallet & Balance
