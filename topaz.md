@@ -555,24 +555,42 @@ Hazen runs an automated, continuously-refreshed snapshot of our own Topaz full n
 | Contents | `db/` + `wal/` only (never `secrets/`, `config/`, or genesis) |
 | Schedule | Every 6 hours |
 | Retention | Last 3 snapshots always kept, oldest auto-deleted |
-| Compression | `tar` + `lz4` |
+| Compression | `lz4` (chosen for speed over ratio — the node is briefly stopped for a consistent snapshot, so minimizing downtime matters more than shaving off the last few % of size) |
+| Typical size | ~2.4 GB compressed (uncompressed `db/`+`wal/` is currently ~4 GB combined and grows with chain height) |
 | Manifest (JSON) | `https://server-9.hazennetworksolutions.com/gnoland-topaz/index.json` |
 | Browsable page | [explorer.hazennetworksolutions.com/gnoland-testnet/snapshot](https://explorer.hazennetworksolutions.com/gnoland-testnet/snapshot/) — file name, block height, size, and SHA-256 for the current snapshot |
 
-The manifest is a small JSON file describing the latest snapshot:
+### What's actually inside `db/` and `wal/`
+
+Topaz's `config.toml` sets `db_backend = "pebbledb"` — [PebbleDB](https://github.com/cockroachdb/pebble) is CockroachDB's Go-native, RocksDB-inspired LSM-tree key-value store (not the default `goleveldb` some older Tendermint chains still use). Under `db/` it keeps four separate PebbleDB instances, each its own set of `.sst`/`MANIFEST` files:
+
+| File/dir under `db/` | What it stores |
+|---|---|
+| `blockstore.db` | Raw block data (headers, transactions, commits) for every block |
+| `state.db` | Tendermint2 consensus state — validator sets, consensus params, ABCI responses |
+| `gnolang.db` | The actual GnoVM application state — every realm's package data, i.e. what `vm/qrender` reads from |
+| `genesis-cache` | Cached genesis app-state so it isn't re-parsed from `genesis.json` on every restart |
+
+`wal/cs.wal` is the **consensus write-ahead log** — a short-lived crash-recovery log for whatever round/step consensus was in when the node stopped, not a history of the chain. It's small (roughly hundreds of MB to ~1 GB in our own snapshots) compared to `db/`, but it's still included because replaying from a `db/`-only snapshot without the matching `wal/` risks the node not recognizing where consensus left off cleanly.
+
+The manifest is a small JSON file describing the latest snapshot (real example from our server):
 
 ```json
 {
-  "generatedAt": "2026-07-28T09:17:03Z",
-  "file": "gnoland-topaz-20260728-0917.tar.lz4",
-  "url": "https://server-9.hazennetworksolutions.com/gnoland-topaz/gnoland-topaz-20260728-0917.tar.lz4",
-  "blockHeight": 253012,
-  "sizeBytes": 187342911,
-  "sha256": "…",
-  "compression": "tar+lz4",
+  "chainId": "topaz-1",
+  "file": "gnoland_topaz_2026-07-28_256282.tar.lz4",
+  "url": "https://server-9.hazennetworksolutions.com/gnoland-topaz/gnoland_topaz_2026-07-28_256282.tar.lz4",
+  "stableUrl": "https://server-9.hazennetworksolutions.com/gnoland-topaz/gnoland-db-snapshot.tar.lz4",
+  "blockHeight": 256282,
+  "sizeBytes": 2564196428,
+  "sha256": "f360193b1ddaf16c760d390fa0dc5c694151e469a1b9df36b10ded616be502b0",
+  "generatedAt": "2026-07-28T09:30:10Z",
+  "compression": "lz4",
   "contents": ["db", "wal"]
 }
 ```
+
+`stableUrl` always points at whatever the *current* snapshot is (safe to hardcode in scripts); `url` is the specific dated filename for that snapshot (changes every cycle, useful for caching/verification against a known `sha256`).
 
 ### One-line restore
 
