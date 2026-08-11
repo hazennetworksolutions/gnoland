@@ -145,6 +145,7 @@ Download the binaries matching your OS/arch from the [chain/sapphire release pag
 
 ```bash
 cd $HOME
+wget https://github.com/gnolang/gno/releases/download/chain/sapphire/gno_linux_amd64
 wget https://github.com/gnolang/gno/releases/download/chain/sapphire/gnoland_linux_amd64
 wget https://github.com/gnolang/gno/releases/download/chain/sapphire/gnokey_linux_amd64
 wget https://github.com/gnolang/gno/releases/download/chain/sapphire/gnoweb_linux_amd64
@@ -152,9 +153,16 @@ wget https://github.com/gnolang/gno/releases/download/chain/sapphire/CHECKSUMS.t
 
 sha256sum -c CHECKSUMS.txt --ignore-missing
 
+sudo install -m 0755 gno_linux_amd64 /usr/local/bin/gno
 sudo install -m 0755 gnoland_linux_amd64 /usr/local/bin/gnoland
 sudo install -m 0755 gnokey_linux_amd64 /usr/local/bin/gnokey
 sudo install -m 0755 gnoweb_linux_amd64 /usr/local/bin/gnoweb
+```
+
+The rest of this guide runs its `gnoland`/`gnokey` commands from a `$HOME/gno` working directory (that's where Step 5 downloads `genesis.json` and where the systemd service's `WorkingDirectory`/`GNOROOT` point). Option B gets this directory for free from `git clone`; on the prebuilt-binary path you need to create it yourself:
+
+```bash
+mkdir -p $HOME/gno
 ```
 
 ### Option B — Build from source
