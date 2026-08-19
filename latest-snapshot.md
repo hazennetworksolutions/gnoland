@@ -24,11 +24,42 @@
 | SHA-256 | `d7e8c5b32c483aaebc36f19f8490d7db962742b7413bb35834cf00a871376064` |
 | Manifest (JSON, always current) | https://server-9.hazennetworksolutions.com/gnoland-sapphire/index.json |
 
-The manifest above always points at the *latest* snapshot — check it before restoring if you want the current block height/hash without downloading first.
-
 ---
 
 ## Option A — One-line restore (recommended)
 
 ```bash
 curl -fsSL https://server-9.hazennetworksolutions.com/gnoland-sapphire/restore.sh | bash
+```
+
+If your setup differs from the default paths in [sapphire.md](sapphire.md):
+
+```bash
+DATA_DIR=/path/to/gnoland-data SERVICE=your-service-name \
+  curl -fsSL https://server-9.hazennetworksolutions.com/gnoland-sapphire/restore.sh | bash
+```
+
+---
+
+## Option B — Manual restore
+
+```bash
+sudo apt update
+sudo apt install lz4 -y
+
+sudo systemctl stop gnoland
+
+cp -a $HOME/gno/gnoland-data/secrets /tmp/secrets.bak
+cp -a $HOME/gno/gnoland-data/config /tmp/config.bak
+rm -rf $HOME/gno/gnoland-data/db $HOME/gno/gnoland-data/wal
+
+wget -O - https://server-9.hazennetworksolutions.com/gnoland-db-snapshot.tar.lz4 \
+  | lz4 -d | tar -xf - -C $HOME/gno/gnoland-data
+
+cp -a /tmp/secrets.bak/. $HOME/gno/gnoland-data/secrets/
+cp -a /tmp/config.bak/. $HOME/gno/gnoland-data/config/
+
+sudo systemctl start gnoland
+```
+
+> ⚠️ Never copy another node's `secrets/` onto yours — mixing validator keys between two live nodes causes a slashable double-sign.
