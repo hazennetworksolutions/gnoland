@@ -1,14 +1,15 @@
 <div align="center">
 
-# 🌐 Gnoland Pearl — Full Node & Validator Setup Guide
+# 🌐 Gnoland Onyx — Full Node & Validator Setup Guide
 
-**A complete guide to running a Gnoland Pearl full node and registering as a validator**  
-*Build from source, configuration, fast fresh-genesis sync, and validator registration via GovDAO — step by step.*
+**A complete guide to running a Gnoland Onyx full node and registering as a validator candidate**  
+*Pinned release binaries, verified genesis, mainnet-equivalent configuration, systemd operation, and GovDAO-based validator onboarding — step by step.*
 
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04+-E95420?style=flat-square&logo=ubuntu&logoColor=white)](https://ubuntu.com)
-[![Gnoland](https://img.shields.io/badge/Gnoland-Pearl-4ADEDE?style=flat-square)](https://gno.land)
-[![Branch](https://img.shields.io/badge/Branch-chain%2Fpearl-brightgreen?style=flat-square)](https://github.com/gnolang/gno)
-[![Chain ID](https://img.shields.io/badge/Chain%20ID-pearl--1-blue?style=flat-square)](https://docs.gno.land)
+[![Gnoland](https://img.shields.io/badge/Gnoland-Onyx-111827?style=flat-square)](https://gno.land)
+[![Release](https://img.shields.io/badge/Release-chain%2Fonyx-brightgreen?style=flat-square)](https://github.com/gnolang/gno/releases/tag/chain%2Fonyx)
+[![Chain ID](https://img.shields.io/badge/Chain%20ID-onyx--1-blue?style=flat-square)](https://docs.gno.land)
+[![Launch](https://img.shields.io/badge/Launch-v1.5.0-8B5CF6?style=flat-square)](https://github.com/gnolang/gno/releases/tag/v1.5.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 
 [hazennetworksolutions.com](https://hazennetworksolutions.com)
@@ -18,9 +19,11 @@
 ---
 
 > **Author:** HazenNetworkSolutions  
-> **Network:** Gnoland Pearl Testnet (Chain ID: pearl-1)  
-> **Branch:** chain/pearl  
-> **Last Updated:** August 2026
+> **Network:** Gnoland Onyx Testnet (Chain ID: onyx-1)  
+> **Chain release:** chain/onyx  
+> **Launch version:** v1.5.0  
+> **Launch time:** September 28, 2026 at 00:00 UTC  
+> **Last Updated:** September 2026
 
 ---
 
@@ -28,28 +31,44 @@
 
 | Type | Language | Link |
 |------|----------|------|
-| Full Node & Validator Setup | 🇬🇧 English | [pearl.md](pearl.md) |
+| Full Node & Validator Setup | 🇬🇧 English | [onyx.md](onyx.md) |
 
 ---
 
 ## 📋 Overview
 
-Gnoland is a smart contract platform powered by Gnolang (Gno), an interpreted version of Go designed for transparency and composability. Pearl is the testnet that succeeds Sapphire in the Gnoland rollout — a **fresh chain, not a hardfork**: it builds a new ~2.6–2.7 MB genesis straight from the `examples/` tree (85 curated packages) in about a minute instead of replaying Sapphire's transaction history, so nodes sync in minutes and **no balances, realms, or names carry over from Sapphire**.
+Gnoland is a smart-contract platform powered by Gnolang (Gno), an interpreted version of Go designed for transparency and composability. **Onyx** is the mainnet-rehearsal testnet that replaces Pearl. It is a fresh chain, not a Pearl hardfork: Pearl balances, packages, names, and state do not carry over.
 
-Pearl launches with **3 founding validators** (operator-keyed valoper profiles, power 60 each), namespace enforcement (`r/sys/names`) live from block 1, 3 pre-funded faucet accounts, unrestricted token transfers, and a new **genesis vesting accounts** feature (linear-unlock and cliff schedules for test accounts).
+Onyx launched with the unchanged **v1.5.0 mainnet binaries** and is designed to run mainnet code one release candidate ahead from the next release onward. Every coordinated mainnet upgrade is rehearsed on Onyx first. Operators must therefore use the exact version in Onyx's [`UPGRADES.md`](https://github.com/gnolang/gno/blob/chain/mainnet/misc/deployments/onyx.gno.land/UPGRADES.md), never a floating tag, `master`, or an arbitrary branch tip.
 
-Validator registration on Gnoland is **GovDAO-based** — validators register by calling a realm (smart contract) and are added to the active set through a governance proposal. This process is permissioned and community-driven.
+Onyx mirrors mainnet's genesis shape and operating rules:
 
-- Official Docs: [docs.gno.land](https://docs.gno.land)
-- GitHub: [github.com/gnolang/gno](https://github.com/gnolang/gno)
-- Release notes: [chain/pearl](https://github.com/gnolang/gno/releases/tag/chain%2Fpearl)
-- Explorer: [pearl.testnets.gno.land](https://pearl.testnets.gno.land)
-- Faucet: [pearl.testnets.gno.land/faucet](https://pearl.testnets.gno.land/faucet)
-- Valopers: [pearl.testnets.gno.land/r/gnops/valopers](https://pearl.testnets.gno.land/r/gnops/valopers)
-- Active Validators: [pearl.testnets.gno.land/r/sys/validators/v3](https://pearl.testnets.gno.land/r/sys/validators/v3)
-- Gnockpit: [gnockpit.pearl.testnets.gno.land](https://gnockpit.pearl.testnets.gno.land)
-- Status: [status.pearl.testnets.gno.land](https://status.pearl.testnets.gno.land)
-- Tx-indexer (GraphQL): [indexer.pearl.testnets.gno.land/graphql](https://indexer.pearl.testnets.gno.land/graphql)
+- 89 curated genesis packages on the `/v0` layout, byte-for-byte aligned with mainnet's package list at launch
+- The same seven initial namespaces, with `r/sys/names` enforcement enabled from block 1
+- The same sole GovDAO T1 seed, `aeddi`
+- Inert post-genesis package submission with the `gpao` approvals oracle
+- `maketx run` restricted to the seeded member
+- One founding validator, `gno-core-validator-1`
+
+The differences are economic and testnet-oriented: Onyx uses faucet GNOT, funds four operational accounts, has open transfers from genesis, has no Constitution §126 lock or exemption list, and has no vesting allocation.
+
+Validator onboarding is GovDAO-based. An operator first registers a valoper profile on `gno.land/r/gnops/valopers`; registration creates a **candidate**, not an active validator. A GovDAO proposal through `r/sys/validators/v0` must pass before the node enters the active set.
+
+### Official Resources
+
+- Chain release and genesis: [chain/onyx](https://github.com/gnolang/gno/releases/tag/chain%2Fonyx)
+- Version binaries: [v1.5.0](https://github.com/gnolang/gno/releases/tag/v1.5.0)
+- Upgrade ledger: [UPGRADES.md](https://github.com/gnolang/gno/blob/chain/mainnet/misc/deployments/onyx.gno.land/UPGRADES.md)
+- Official validator notes: [VALIDATOR.md](https://github.com/gnolang/gno/blob/chain/mainnet/misc/deployments/onyx.gno.land/VALIDATOR.md)
+- Deployment directory: [onyx.gno.land](https://github.com/gnolang/gno/tree/chain/mainnet/misc/deployments/onyx.gno.land)
+- Web / Explorer: [onyx.testnets.gno.land](https://onyx.testnets.gno.land)
+- RPC: [rpc.onyx.testnets.gno.land](https://rpc.onyx.testnets.gno.land)
+- Faucet: [onyx.testnets.gno.land/faucet](https://onyx.testnets.gno.land/faucet)
+- Valopers: [onyx.testnets.gno.land/r/gnops/valopers](https://onyx.testnets.gno.land/r/gnops/valopers)
+- Active Validators: [onyx.testnets.gno.land/r/sys/validators/v0](https://onyx.testnets.gno.land/r/sys/validators/v0)
+- Gnockpit: [gnockpit.onyx.testnets.gno.land](https://gnockpit.onyx.testnets.gno.land)
+- Status: [status.onyx.testnets.gno.land](https://status.onyx.testnets.gno.land)
+- Documentation: [docs.gno.land](https://docs.gno.land)
 - Discord: [discord.com/invite/S8nKUqwkPn](https://discord.com/invite/S8nKUqwkPn)
 
 ---
